@@ -9,7 +9,7 @@ import json
 
 @require_GET
 def get_api_view(request):
-    # 여기에서 GET 요청을 처리하고 응답을 생성합니다.
+    # 여기에서 GET 요청을 처리하고 응답을 생성합니다.!!
     result = {'message': 'GET 요청이 성공적으로 처리되었습니다.'}
     return JsonResponse(result)
 
