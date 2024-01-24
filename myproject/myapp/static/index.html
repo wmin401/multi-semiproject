@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 페이지</title>
+</head>
+<body>
+    <h1>API 서버 테스트 페이지</h1>
+
+    <div>
+        <label for="dataInput">데이터 입력:</label>
+        <input type="text" id="dataInput" placeholder="입력하세요">
+    </div>
+
+    <button onclick="sendGetRequest()">GET 요청 보내기</button>
+    <button onclick="sendPostRequest()">POST 요청 보내기</button>
+
+    <div id="response"></div>
+
+    <script>
+        function sendGetRequest() {
+            fetch('http://127.0.0.1:8000/get-api/', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseDiv = document.getElementById("response");
+                responseDiv.innerHTML = `<p>응답: ${JSON.stringify(data)}</p>`;
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                const responseDiv = document.getElementById("response");
+                responseDiv.innerHTML = `<p>에러 발생: ${error.message}</p>`;
+            });
+        }
+
+        function sendPostRequest() {
+            const dataInput = document.getElementById("dataInput");
+            const inputData = dataInput.value;
+
+            fetch('http://127.0.0.1:8000/post-api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data: inputData }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseDiv = document.getElementById("response");
+                responseDiv.innerHTML = `<p>응답: ${JSON.stringify(data)}</p>`;
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                const responseDiv = document.getElementById("response");
+                responseDiv.innerHTML = `<p>에러 발생: ${error.message}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>
