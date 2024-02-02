@@ -1,7 +1,7 @@
 # myapp/urls.py
 # myapp/urls.py
 from django.urls import path
-from .views import get_api_view, post_api_view
+from .views import get_api_view, post_api_view, visualize_data
 from django.views.static import serve
 from django.conf import settings
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('post-api/', post_api_view, name='post-api'),
     path('static/<path:path>/', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
     path('', serve, {'document_root': settings.STATICFILES_DIRS[0], 'path': 'index.html'}),
+    path('visualize/', visualize_data, name='visualize_data'),
 ]
