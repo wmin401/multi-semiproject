@@ -3,60 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API 페이지</title>
+    <title>통장잔고2조 - 머신러닝 알고리즘 시각화</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            display: inline-block;
+        }
+
+        #response {
+            margin-top: 20px;
+        }
+
+        .visualization {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #teamName {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        #topic {
+            font-style: italic;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-    <h1>API 서버 테스트 페이지</h1>
+    <div class="team-info">
+        <p id="teamName">통장잔고2조</p>
+        <p id="topic">국민 여행조사 데이터 및 크롤링 데이터 수집을 활용하여 머신러닝 분류(Classification) 알고리즘 시각화 하기</p>
+    </div>
 
     <div>
         <label for="dataInput">데이터 입력:</label>
         <input type="text" id="dataInput" placeholder="입력하세요">
     </div>
 
-    <button onclick="sendGetRequest()">GET 요청 보내기</button>
-    <button onclick="sendPostRequest()">POST 요청 보내기</button>
+    <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="visualizeAlgorithm('K-means Cluster')">K-means Cluster 알고리즘</button>
+    <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
+    <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
 
     <div id="response"></div>
 
+    <div id="visualization" class="visualization">
+        <!-- Placeholder for visualization graphs -->
+         <div id="text-container">
+        <!-- Placeholder for additional text -->
+             <p>Algorithm: <span id="algorithmName"></span></p>
+        </div>
+         <div id="visualization-container">
+        <!-- Placeholder for visualization graphs -->
+        </div>
+    </div>
+
+    <div id="algorithmDescription" class="visualization">
+        <!-- Placeholder for algorithm description -->
+    </div>
+
     <script>
-        function sendGetRequest() {
-            fetch('http://127.0.0.1:8000/get-api/', {
-                method: 'GET',
-            })
-            .then(response => response.json())
-            .then(data => {
-                const responseDiv = document.getElementById("response");
-                responseDiv.innerHTML = `<p>응답: ${JSON.stringify(data)}</p>`;
-            })
-            .catch(error => {
-                console.error('에러 발생:', error);
-                const responseDiv = document.getElementById("response");
-                responseDiv.innerHTML = `<p>에러 발생: ${error.message}</p>`;
-            });
-        }
+    async function visualizeNaiveBayes(algorithm) {
+        try {
+            const response = await fetch('/naive_bayes/');
+            const data = await response.json();
+            const algorithmName = 'Naive Bayes Classifier';  // You can customize this based on the selected algorithm
 
-        function sendPostRequest() {
-            const dataInput = document.getElementById("dataInput");
-            const inputData = dataInput.value;
 
-            fetch('http://127.0.0.1:8000/post-api/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ data: inputData }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                const responseDiv = document.getElementById("response");
-                responseDiv.innerHTML = `<p>응답: ${JSON.stringify(data)}</p>`;
-            })
-            .catch(error => {
-                console.error('에러 발생:', error);
-                const responseDiv = document.getElementById("response");
-                responseDiv.innerHTML = `<p>에러 발생: ${error.message}</p>`;
-            });
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image}" alt="Naive Bayes Classifier Visualization">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image2}" alt="Second Image">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 가구 소득 및 여행 횟수에 따른 차량 보유 여부를 Gaussian Naive Bayes Classifier 머신러닝을 활용하여 예측하였습니다.<br>
+            - X-Axis는 1년간 여행 횟수를 나타내며, Y-Axis 가구 당 소득 금액을 나타냅니다.<br>
+            - 가우시안 나이브 베이즈 분류기(Gaussian Naive Bayes Classifier) 이론에 따르면, 각 변수가 독립적일 때, 각 클래스의 특징은 가우시안 분포(정규 분포)에 따릅니다.<br>
+            - 입력 값이 연속적인 실수이거나, 범주형 변수 일 때, 많이 사용되는 머신러닝 알고리즘으로써, 차량 여부를 예측하는데 있어서 가구 소득(범주 형), 여행 횟수(연속적인 실수) 데이터 활용은 적합하였습니다.<br>
+            - 아래의 분류 보고서에 따르면, 해당 모델의 전체적인 정확도는 91%이며, 0.0(No Vehicle) 클래스에 대한 정밀도(Precision) 76%, 1.0(Vehicle) 클래스에 대한 정밀도(Precision) 93%로써,
+            각 클래스로 예측된 모든 인스턴스 중 76%는 No Vehicle(챠량을 보유하고 있지 않음), 93%는 Vehicle(차량을 보유하고 있음)을 나타냅니다.<br>
+            - 전체 데이터 중 75%는 Training Data Set으로 활용하여 모델을 훈련 시키는데 활용 되었고, 25%는 Testing Data Set로 활용되어 모델 성능을 평가하는데 사용되었습니다. <br>
+            - 그러므로, 두 그래프는 비슷한 패턴을 그리고 있어, 해당 모델은 가구 소득 및 여행 횟수에 따른 차량보유를 예측하는데 적합합니다.
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${data.accuracy * 100}%</p>`;
+
+            // Add classification report dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
         }
+    }
+
+    function visualizeAlgorithm(algorithm) {
+        // You can implement logic to fetch and display visualization graphs
+        const visualizationDiv = document.getElementById("visualization");
+        visualizationDiv.innerHTML = `<p>시각화 그래프: Placeholder for ${algorithm}</p>`;
+
+        // You can implement logic to fetch and display algorithm description
+        const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+        algorithmDescriptionDiv.innerHTML = `<p>알고리즘 설명: Placeholder for ${algorithm}</p>`;
+
+        // Dynamically set the algorithm name based on the selected algorithm
+        const algorithmName = algorithm;
+
+        // Update the visualization container with the received data
+        document.getElementById("visualization").innerHTML = `<img src="data:image/png;base64, " alt="${algorithmName} Visualization">`;
+
+        // Add algorithm name text dynamically
+        document.getElementById("algorithmDescription").innerHTML = `<p>알고리즘 설명: ${algorithmName}</p>`;
+    }
+
+    function crawlData() {
+        // You can implement logic for crawling data
+        const responseDiv = document.getElementById("response");
+        responseDiv.innerHTML = `<p>크롤링을 활용한 데이터 수집: Placeholder for data crawling result</p>`;
+    }
     </script>
 </body>
 </html>
