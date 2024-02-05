@@ -89,6 +89,7 @@
     <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
     <button onclick="visualizeLinearRegression('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="visualizeLogisticRegression('Logistic Regression')">Logistic Regression 알고리즘</button>
     <button onclick="visualizeAlgorithm('K-means Cluster')">K-means Cluster 알고리즘</button>
     <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
     <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
@@ -150,6 +151,39 @@
             // Handle error, show a message, etc.
         }
     }
+
+    async function visualizeLogisticRegression(algorithm) {
+        try {
+            const response = await fetch('/Logistic_Regression/');
+            const data = await response.json();
+            const algorithmName = 'Logistic_Regression';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Top_3_Travel_Types">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행지와 여행유형을 가지고 여행유형별 가장인기있는 여행지 Top3을 Logistic Regression 머신러닝을 활용하여 분석.
+            - 로지스틱회귀 : 데이터가 어떤 범주에 속할 확률을 0에서1 사이의 값으로 예측하고 그 확률에 따라 가능성이 더 높은 범주에 속하는 것으로 분류하는 이진분류 모델.
+            - 2022년의 여행지와 여행유형문자 데이터를 인코딩하여 Boolean타입과 숫자로 변경 후 데이터 분석.
+            - 분석 결과 그래프를 확인해보면, 강릉, 경주, 제주의 여행지 선택이 가장 많았고 그중에선 자연관광, 맛집탐방, 휴식의 순으로 여행유형의 선택이 많았다.
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${data.accuracy * 100}%</p>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
     </script>
 </body>
 </html>
