@@ -16,118 +16,143 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import base64
 from io import BytesIO
 from matplotlib.colors import ListedColormap
+from sklearn.linear_model import LinearRegression
+import seaborn as sns
+import urllib
 import threading  # 새로운 라이브러리 추가
 
+def plot_heatmap(correlation_matrix):
+    plt.figure(figsize=(10,10))
+    sns.heatmap(correlation_matrix, annot=True)
 
-def plot_thread(X_set, y_set, classifier, modelSet):
-    buffer = BytesIO()
-    cmap_background = ListedColormap(['#FFAAAA', '#AAAAFF'])
-    cmap_points = ListedColormap(['#FF0000', '#0000FF'])
+    # 그래프를 이미지 파일로 저장
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    # 이미지 파일을 base64로 인코딩
+    plot_image = base64.b64encode(image.getvalue()).decode()
 
-    # Meshgrid 생성
-    h = .02  # Step size in the mesh
-    x_min, x_max = X_set[:, 0].min() - 1, X_set[:, 0].max() + 1
-    y_min, y_max = X_set[:, 1].min() - 1, X_set[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-
-    # 예측 결과 가져오기
-    Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-
-    # 결정 경계 및 데이터 포인트 시각화
-    plt.contourf(xx, yy, Z, cmap=cmap_background, alpha=0.3)
-    scatter = plt.scatter(X_set[:, 0], X_set[:, 1], c=y_set, cmap=cmap_points, edgecolor='k', s=20, label=('No Vehicle', 'Vehicle'))
-
-    plt.title('Decision Boundary Plot ({})'.format(modelSet))
-    plt.xlabel('Travel Frequency per Year')
-    plt.ylabel('HouseHold Income')
-
-    # Customize tick labels on the y-axis
-    y_ticks = [-2, -1, 0, 1, 2]
-    y_tick_labels = ['< ₩1,000,000', '< ₩2,000,000', '< ₩3,000,000', '< ₩4,000,000', '< ₩5,000,000']
-    plt.yticks(y_ticks, y_tick_labels)
-
-    # Customize tick labels on the x-axis
-    x_ticks = [0, 2, 4, 6, 8, 10]
-    x_tick_labels = [0, 1, 2, 3, 4, 5]
-    plt.xticks(x_ticks, x_tick_labels)
-
-    plt.legend(handles=scatter.legend_elements()[0], title="Vehicle Possession", labels=('No Vehicle', 'Vehicle'))
-    plt.savefig(buffer, format='png')  # Change this line
-    buffer.seek(0)
     plt.close()
-    return base64.b64encode(buffer.getvalue()).decode('utf-8')
 
+    return plot_image
 
-def naive_bayes(request):
+def plot_mse(X_test, y_test, y_pred, mse):
+    plt.figure(figsize=(15, 7))
+    plt.scatter(X_test, y_test, color='blue', label='Actual')
+    plt.plot(X_test, y_pred, color='red', label='Predicted')
+    plt.title('Linear Regression using MSE\nMSE: {0:.2f}'.format(mse))
+    plt.xlabel('Cost')
+    plt.ylabel('the number of days of travel')
+    plt.legend()
+
+    # 그래프를 이미지 파일로 저장
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    # 이미지 파일을 base64로 인코딩
+    plot_image = base64.b64encode(image.getvalue()).decode()
+
+    plt.close()
+
+    return plot_image
+
+def plot_training_set(X_train, y_train, regressor):
+    plt.figure(figsize=(15, 7))
+    plt.scatter(X_train, y_train, color='blue')
+    plt.plot(X_train, regressor.predict(X_train), color='red')
+    plt.title('Training set')
+    plt.xlabel('average monthly income')
+    plt.ylabel('Expenditure amount')
+
+    # 그래프를 이미지 파일로 저장
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    # 이미지 파일을 base64로 인코딩
+    plot_image = base64.b64encode(image.getvalue()).decode()
+
+    plt.close()
+
+    return plot_image
+
+def plot_test_set(X_test, y_test, regressor):
+    plt.figure(figsize=(15, 7))
+    plt.scatter(X_test, y_test, color='blue')
+    plt.plot(X_test, regressor.predict(X_test), color='red') # 변경: 테스트 데이터에 대한 예측값 사용
+    plt.title('Test set')
+    plt.xlabel('average monthly income')
+    plt.ylabel('Expenditure amount')
+
+    # 그래프를 이미지 파일로 저장
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    # 이미지 파일을 base64로 인코딩
+    plot_image = base64.b64encode(image.getvalue()).decode()
+
+    plt.close()
+
+    return plot_image
+
+def Linear_Regression(request):
     # 데이터 로딩
-    file_path = 'DATA_2022년_국민여행조사_Bayes.csv'
+    file_path = 'LinearRegression.csv'
 
     # 특정 컬럼 추출
-    data = pd.read_csv(file_path, encoding='cp949', low_memory=False)
+    dataset = pd.read_csv(file_path, encoding='cp949', low_memory=False)
 
-    data = data[['SA1_1', 'BINC1', 'DQ7']]
+    # D_TRA1_S_Day 컬럼의 NaN값 삭제
+    dataset = dataset.dropna(subset=['D_TRA1_S_Day'])
 
-    # 칼럼 이름 변경
-    culumn_names = {
-                    'BINC1': '가구소득',
-                    'SA1_1': '여행횟수',
-                    'DQ7': '차량보유여부'
-                    }
+    # 업데이트된 데이터셋 사용
+    selected_columns = dataset[['D_TRA1_COST', 'D_TRA1_S_Day', 'D_TRA1_ONE_COST']]
 
-    data.rename(columns=culumn_names, inplace=True)
+    # 데이터 컬럼명 변경
+    dataset = dataset.rename(columns={'D_TRA1_COST': '지출액', 'D_TRA1_S_Day': '여행일', 'D_TRA1_ONE_COST': '1인지출비용'})
 
-    # 인코딩
-    label_encoder = LabelEncoder()
-    data['여행횟수'] = label_encoder.fit_transform(data['여행횟수'])
-    ordinal_encoder = OrdinalEncoder(categories=[['  100만원미만', '  100~200만원미만', '  200~300만원미만',
-                                                  '  300~400만원미만', '  400~500만원미만', '  500~600만원미만', '  600만원 이상']])
+    # 선택된 컬럼들의 상관관계 계산
+    correlation_matrix = selected_columns.corr()
 
-    ordinal_encoder2 = OrdinalEncoder(categories=[['보유하지 않음', '보유하고 있음']])
-    data['가구소득'] = ordinal_encoder.fit_transform(data[['가구소득']])
-    data['차량보유여부'] = ordinal_encoder2.fit_transform(data[['차량보유여부']])
+    # '여행일'을 독립 변수로, '1인지출비용'을 종속 변수로 설정
+    X = dataset['1인지출비용'].values.reshape(-1, 1)
+    y = dataset['여행일'].values.reshape(-1, 1)
 
-    # 결측값 제거
-    x = data.iloc[:, [0, 1]].values
-    y = data.iloc[:, 2].values
+    # 데이터 분할
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-    # 트레이닝 데이터 셋, 테스트 데이터 셋 분류
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=0)
-
-    # StandardScaler를 사용하여 특성 스케일링
+    # 데이터 표준화
     scaler = StandardScaler()
-    X_train = scaler.fit_transform(x_train)
-    X_test = scaler.transform(x_test)
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
-    # 트레이닝 데이터 세트 네이브 베이즈 분류기 모델 적용
-    classifier = GaussianNB()
-    classifier.fit(X_train, y_train)
+    # 선형 회귀 모델 생성 및 학습
+    regressor = LinearRegression()
+    regressor.fit(X_train, y_train)
 
+    # 예측
+    y_pred = regressor.predict(X_test)
 
+    # MSE 계산
+    mse = metrics.mean_squared_error(y_test, y_pred)
 
-    # 테스트 데이터 세트를 활용하여 결과 예측
-    y_pred = classifier.predict(X_test)
+    plot_image1 = plot_heatmap(correlation_matrix)
+    plot_image2 = plot_training_set(X_train, y_train, regressor)
+    plot_image3 = plot_test_set(X_test, y_test, regressor)
+    plot_image4 = plot_mse(X_test, y_test, y_pred, mse)
 
     # 정확도 측정
-    accuracy = "{:.2f}".format(metrics.accuracy_score(y_test, y_pred))
-    print(f'Accuracy: {accuracy}')
-    print("\n분류 보고서:\n", classification_report(y_test, y_pred))
+    accuracy = "{:.2f}".format(metrics.mean_squared_error(y_test, y_pred))
 
-    # 메트릭 측정
-    cm = confusion_matrix(y_test, y_pred)
+    # 분류 보고서 생성
+    metrics.mean_squared_error_result = metrics.mean_squared_error(y_test, y_pred)
 
-    plot_image = plot_thread(X_train, y_train, classifier, "Training Set")
-    plot_image2 = plot_thread(X_test, y_test, classifier, "Testing Set")
-
-    # Return the base64-encoded image, accuracy, and classification report in JSON response
     response_data = {
-        'plot_image': plot_image,
+        'plot_image1': plot_image1,
         'plot_image2': plot_image2,
+        'plot_image3': plot_image3,
+        'plot_image4': plot_image4,
         'accuracy': accuracy,
-        'classification_report': classification_report(y_test, y_pred)
+        'classification_report': metrics.mean_squared_error_result
     }
 
-
-    # Return the base64-encoded image in JSON response
     return JsonResponse(response_data)
-

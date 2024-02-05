@@ -88,7 +88,7 @@
     <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
     <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
-    <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="visualizeLinearRegression('Linear Regression')">Linear Regression 알고리즘</button>
     <button onclick="visualizeAlgorithm('K-means Cluster')">K-means Cluster 알고리즘</button>
     <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
     <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
@@ -151,6 +151,42 @@
         }
     }
 
+    async function visualizeLinearRegression(algorithm) {
+        try {
+            const response = await fetch('/Linear_Regression/');
+            const data = await response.json();
+            const algorithmName = 'Linear_Regression';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Heatmap">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image2}" alt="Training Set">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image3}" alt="Test set">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image4}" alt="MSE Set">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - '알고리즘에 관한 디테일한 설명~~'
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${data.accuracy * 100}%</p>`;
+
+            // Add classification report dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
+
     function visualizeAlgorithm(algorithm) {
         // You can implement logic to fetch and display visualization graphs
         const visualizationDiv = document.getElementById("visualization");
@@ -178,3 +214,5 @@
     </script>
 </body>
 </html>
+
+
