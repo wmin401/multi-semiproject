@@ -1,133 +1,111 @@
-
-# myapp/views.py
-
-
-import matplotlib
-matplotlib.use('Agg')
+# import
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-from django.http import JsonResponse
-from sklearn.preprocessing import LabelEncoder, OrdinalEncoder, StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn import metrics
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, RandomizedSearchCV
+import matplotlib.pyplot as plt
+from sklearn import tree
+import seaborn as sns
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.preprocessing import StandardScaler
 import base64
 from io import BytesIO
-from matplotlib.colors import ListedColormap
-import threading  # 새로운 라이브러리 추가
+from django.http import JsonResponse
+
+def DecisionTree(request):
+    # CSV 파일 경로
+    file_path = 'COST_and_ONECOST.csv'
+
+    # CSV 파일 읽고, 인코딩 설정
+    df = pd.read_csv(file_path, encoding='cp949', low_memory=False)
+
+    # 필요한 컬럼 추출 (COST = 여행 총 경비 / ONE_COST = 1인 지출 비용)
+    df1 = df[['D_TRA1_COST', 'D_TRA1_ONE_COST']].copy()
+    # 결측치 처리 둘중에 선택 전자는 평균값으로 / 후자는 결측치행삭제 / 전처리작업
+    #df1.fillna(df1.mean(), inplace=True)
+    df1.dropna(inplace=True)
 
 
-def plot_thread(X_set, y_set, classifier, modelSet):
-    buffer = BytesIO()
-    cmap_background = ListedColormap(['#FFAAAA', '#AAAAFF'])
-    cmap_points = ListedColormap(['#FF0000', '#0000FF'])
-
-    # Meshgrid 생성
-    h = .02  # Step size in the mesh
-    x_min, x_max = X_set[:, 0].min() - 1, X_set[:, 0].max() + 1
-    y_min, y_max = X_set[:, 1].min() - 1, X_set[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-
-    # 예측 결과 가져오기
-    Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-
-    # 결정 경계 및 데이터 포인트 시각화
-    plt.contourf(xx, yy, Z, cmap=cmap_background, alpha=0.3)
-    scatter = plt.scatter(X_set[:, 0], X_set[:, 1], c=y_set, cmap=cmap_points, edgecolor='k', s=20, label=('No Vehicle', 'Vehicle'))
-
-    plt.title('Decision Boundary Plot ({})'.format(modelSet))
-    plt.xlabel('Travel Frequency per Year')
-    plt.ylabel('HouseHold Income')
-
-    # Customize tick labels on the y-axis
-    y_ticks = [-2, -1, 0, 1, 2]
-    y_tick_labels = ['< ₩1,000,000', '< ₩2,000,000', '< ₩3,000,000', '< ₩4,000,000', '< ₩5,000,000']
-    plt.yticks(y_ticks, y_tick_labels)
-
-    # Customize tick labels on the x-axis
-    x_ticks = [0, 2, 4, 6, 8, 10]
-    x_tick_labels = [0, 1, 2, 3, 4, 5]
-    plt.xticks(x_ticks, x_tick_labels)
-
-    plt.legend(handles=scatter.legend_elements()[0], title="Vehicle Possession", labels=('No Vehicle', 'Vehicle'))
-    plt.savefig(buffer, format='png')  # Change this line
-    buffer.seek(0)
-    plt.close()
-    return base64.b64encode(buffer.getvalue()).decode('utf-8')
-
-
-def naive_bayes(request):
-    # 데이터 로딩
-    file_path = 'DATA_2022년_국민여행조사_Bayes.csv'
-
-    # 특정 컬럼 추출
-    data = pd.read_csv(file_path, encoding='cp949', low_memory=False)
-
-    data = data[['SA1_1', 'BINC1', 'DQ7']]
-
-    # 칼럼 이름 변경
-    culumn_names = {
-                    'BINC1': '가구소득',
-                    'SA1_1': '여행횟수',
-                    'DQ7': '차량보유여부'
-                    }
-
-    data.rename(columns=culumn_names, inplace=True)
-
-    # 인코딩
-    label_encoder = LabelEncoder()
-    data['여행횟수'] = label_encoder.fit_transform(data['여행횟수'])
-    ordinal_encoder = OrdinalEncoder(categories=[['  100만원미만', '  100~200만원미만', '  200~300만원미만',
-                                                  '  300~400만원미만', '  400~500만원미만', '  500~600만원미만', '  600만원 이상']])
-
-    ordinal_encoder2 = OrdinalEncoder(categories=[['보유하지 않음', '보유하고 있음']])
-    data['가구소득'] = ordinal_encoder.fit_transform(data[['가구소득']])
-    data['차량보유여부'] = ordinal_encoder2.fit_transform(data[['차량보유여부']])
-
-    # 결측값 제거
-    x = data.iloc[:, [0, 1]].values
-    y = data.iloc[:, 2].values
-
-    # 트레이닝 데이터 셋, 테스트 데이터 셋 분류
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=0)
-
-    # StandardScaler를 사용하여 특성 스케일링
+    # 데이터 스케일링
     scaler = StandardScaler()
-    X_train = scaler.fit_transform(x_train)
-    X_test = scaler.transform(x_test)
+    df1_scaled = pd.DataFrame(scaler.fit_transform(df1), columns=df1.columns)
+    # 데이터프레임 내용 확인
 
-    # 트레이닝 데이터 세트 네이브 베이즈 분류기 모델 적용
-    classifier = GaussianNB()
-    classifier.fit(X_train, y_train)
+    # 각 변수 분포 확인
+    plt.figure(figsize=(15, 10))
+    plt.hist(df1_scaled, bins=50)
+    plt.title("Histogram of Variable Distribution")
+    plt.xlabel("COST")
+    plt.ylabel("People")
+    plt.xticks([])
+    plt.yticks([])
 
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    plot_image1 = base64.b64encode(image.getvalue()).decode()
+    plt.close()
 
+    # 토탈 상관계수
+    sl_col = df1_scaled[['D_TRA1_COST', 'D_TRA1_ONE_COST']]
+    sns.heatmap(sl_col.corr(), annot=True, fmt=".2f")
 
-    # 테스트 데이터 세트를 활용하여 결과 예측
-    y_pred = classifier.predict(X_test)
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    plot_image2 = base64.b64encode(image.getvalue()).decode()
+    plt.close()
 
-    # 정확도 측정
-    accuracy = "{:.2f}".format(metrics.accuracy_score(y_test, y_pred))
-    print(f'Accuracy: {accuracy}')
-    print("\n분류 보고서:\n", classification_report(y_test, y_pred))
-
-    # 메트릭 측정
-    cm = confusion_matrix(y_test, y_pred)
-
-    plot_image = plot_thread(X_train, y_train, classifier, "Training Set")
-    plot_image2 = plot_thread(X_test, y_test, classifier, "Testing Set")
-
-    # Return the base64-encoded image, accuracy, and classification report in JSON response
-    response_data = {
-        'plot_image': plot_image,
-        'plot_image2': plot_image2,
-        'accuracy': accuracy,
-        'classification_report': classification_report(y_test, y_pred)
+    # X = 독립변수 / y = 종속변수 설정
+    X = df1_scaled[['D_TRA1_COST']]
+    y = df1_scaled[['D_TRA1_ONE_COST']]
+    # 학습데이터, 테스트데이터 분리
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+    # RandomizedSearchCV 파라미터 설정
+    param_distributions = {
+        'max_depth': range(1, 20),
+        'min_samples_split': range(2, 20),
+        'min_samples_leaf': range(1, 20)
     }
 
+    # RandomizedSearchCV를 사용한 모델 생성 및 학습
+    rand_search = RandomizedSearchCV(DecisionTreeRegressor(random_state=1), param_distributions, n_iter=100, cv=3, scoring='neg_mean_squared_error', random_state=1)
+    rand_search.fit(X_train, y_train)
+    # 최적의 파라미터와 점수 출력
 
-    # Return the base64-encoded image in JSON response
+    # 최적 하이퍼 파라미터로 학습된 모델 가져오기
+    DTR = rand_search.best_estimator_
+
+    # 테스트 데이터로 예측
+    y_pred = DTR.predict(X_test)
+
+
+    # 모델 성능 평가
+    mse = mean_squared_error(y_test, y_pred)
+
+    # MAE 계산
+    mae = mean_absolute_error(y_test, y_pred)
+
+    # R-Squared 계산
+    r2 = r2_score(y_test, y_pred)
+
+    # 시각화
+    plt.figure(figsize=(10, 7))
+    tree.plot_tree(DTR, max_depth=2, feature_names=X.columns, filled=True)
+    plt.title("Decision Tree Visualization")
+
+    image = BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)
+    plot_image3 = base64.b64encode(image.getvalue()).decode()
+    plt.close()
+
+    response_data = {
+        'plot_image1': plot_image1,
+        'plot_image2': plot_image2,
+        'plot_image3': plot_image3,
+        'r2_score': r2,  # 위에서 계산한 R-squared 점수
+        'mse': mse  # 평균제곱오차
+    }
+
     return JsonResponse(response_data)
-

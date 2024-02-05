@@ -85,7 +85,7 @@
         <input type="text" id="dataInput" placeholder="입력하세요">
     </div>
 
-    <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
+    <button onclick="visualizeDecisionTree('Decision Tree')">Decision Tree 알고리즘</button>
     <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
     <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
@@ -111,38 +111,42 @@
     </div>
 
     <script>
-    async function visualizeNaiveBayes(algorithm) {
+     async function visualizeDecisionTree(algorithm) {
         try {
-            const response = await fetch('/naive_bayes/');
+            const response = await fetch('/DecisionTree/');
             const data = await response.json();
-            const algorithmName = 'Naive Bayes Classifier';  // You can customize this based on the selected algorithm
+            const algorithmName = 'DecisionTree';  // You can customize this based on the selected algorithm
 
 
             // Update the visualization container with the received data
             document.getElementById("algorithmName").textContent =  algorithm;
-            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image}" alt="Naive Bayes Classifier Visualization">`;
-            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image2}" alt="Second Image">`;
+
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Scatter">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image2}" alt="Heatmap">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image3}" alt="Decision Tree Visualization">`;
             // Add algorithm name text dynamically
 
 
              // Add algorithm name text dynamically
             const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
             algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
-            - 2022년 국민 여행조사 Data Set에 근거하여, 가구 소득 및 여행 횟수에 따른 차량 보유 여부를 Gaussian Naive Bayes Classifier 머신러닝을 활용하여 예측하였습니다.<br>
-            - X-Axis는 1년간 여행 횟수를 나타내며, Y-Axis 가구 당 소득 금액을 나타냅니다.<br>
-            - 가우시안 나이브 베이즈 분류기(Gaussian Naive Bayes Classifier) 이론에 따르면, 각 변수가 독립적일 때, 각 클래스의 특징은 가우시안 분포(정규 분포)에 따릅니다.<br>
-            - 입력 값이 연속적인 실수이거나, 범주형 변수 일 때, 많이 사용되는 머신러닝 알고리즘으로써, 차량 여부를 예측하는데 있어서 가구 소득(범주 형), 여행 횟수(연속적인 실수) 데이터 활용은 적합하였습니다.<br>
-            - 아래의 분류 보고서에 따르면, 해당 모델의 전체적인 정확도는 91%이며, 0.0(No Vehicle) 클래스에 대한 정밀도(Precision) 76%, 1.0(Vehicle) 클래스에 대한 정밀도(Precision) 93%로써,
-            각 클래스로 예측된 모든 인스턴스 중 76%는 No Vehicle(챠량을 보유하고 있지 않음), 93%는 Vehicle(차량을 보유하고 있음)을 나타냅니다.<br>
-            - 전체 데이터 중 75%는 Training Data Set으로 활용하여 모델을 훈련 시키는데 활용 되었고, 25%는 Testing Data Set로 활용되어 모델 성능을 평가하는데 사용되었습니다. <br>
-            - 그러므로, 두 그래프는 비슷한 패턴을 그리고 있어, 해당 모델은 가구 소득 및 여행 횟수에 따른 차량보유를 예측하는데 적합합니다.
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행 총 경비에 따른 1인 지출 비용을 DecisionTree 머신러닝을 활용하여 예측하였습니다.<br>
+            - D_TRA1_COST 는 노드를 나누는 기준이 되는 변수이며, MSE, MAE가 가장 낮아지는 값을 기준으로 잡습니다.<br>
+            - squared_error 는 예측 오차를 나타내는 값이며, 오차를 최소화 하는 방향으로 트리를 분할합니다.<br>
+            - samples 는 노드에 속하는 데이터의 개수를 나타내고, 트리의 루트노드는 전체 데이터의 개수가 됩니다.<br>
+            - value 는 해당 노드에서의 예측값을 나타내고, 해당노드에 속하는 타겟 변수의 평균값으로 설정됩니다.<br>
+            - 루트노드는 여행 총 경비가 표준화된 0.815 이하인 경우 왼쪽노드, 그렇지 않을 경우 오른쪽노드로 분류 됩니다, 여기서 처리된 샘플의 수는 20,012개 이면서 평균 1인당 지출 비용은 표준화된 0.003입니다.<br>
+            - 왼쪽 노드는 여행 총 경비가 표준화된 루트값 0.815이하인 경우의 샘플들이 분류된 것입니다. 이 경우에는 1인당 지출 비용은 평균적으로 표준화된 -0.194이고 여행 총 경비가 낮을수록 1인당 지출 비용도 낮아지는 모습을 보여줍니다.<br>
+            - 오른쪽 노드는 여행 총 경비가 표준화된 루트값 0.815초과인 경우의 샘플들이 분류된 것입니다. 이 경우에는 1인당 지출 비용은 평균적으로 표준화된 2.121이고 여행 총 경비가 높을수록 1인당 지출 비용도 높아지는 모습을 보여줍니다.<br>
+            - 이와같이 의사결정나무 시각화를 통해 알 수 있는 것은 여행 총 경비가 1인당 지출 비용에 어떠한 영향을 미치는지를 알 수 있습니다.
+
             </p>`;
 
-            // Add accuracy dynamically
-            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${data.accuracy * 100}%</p>`;
+            // Add mse dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Mean Squared Error: ${data.mse}</p>`;
 
-            // Add classification report dynamically
-            algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+            // Add r2 dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>R-Squared: ${data.r2_score}</p>`;
 
 
         } catch (error) {
@@ -151,30 +155,6 @@
         }
     }
 
-    function visualizeAlgorithm(algorithm) {
-        // You can implement logic to fetch and display visualization graphs
-        const visualizationDiv = document.getElementById("visualization");
-        visualizationDiv.innerHTML = `<p>시각화 그래프: Placeholder for ${algorithm}</p>`;
-
-        // You can implement logic to fetch and display algorithm description
-        const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
-        algorithmDescriptionDiv.innerHTML = `<p>알고리즘 설명: Placeholder for ${algorithm}</p>`;
-
-        // Dynamically set the algorithm name based on the selected algorithm
-        const algorithmName = algorithm;
-
-        // Update the visualization container with the received data
-        document.getElementById("visualization").innerHTML = `<img src="data:image/png;base64, " alt="${algorithmName} Visualization">`;
-
-        // Add algorithm name text dynamically
-        document.getElementById("algorithmDescription").innerHTML = `<p>알고리즘 설명: ${algorithmName}</p>`;
-    }
-
-    function crawlData() {
-        // You can implement logic for crawling data
-        const responseDiv = document.getElementById("response");
-        responseDiv.innerHTML = `<p>크롤링을 활용한 데이터 수집: Placeholder for data crawling result</p>`;
-    }
     </script>
 </body>
 </html>
