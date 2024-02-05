@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통장잔고2조 - 머신러닝 알고리즘 시각화</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            display: inline-block;
+        }
+
+        #response {
+            margin-top: 20px;
+        }
+
+        .visualization {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #teamName {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        #topic {
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="team-info">
+        <p id="teamName">통장잔고2조</p>
+        <p id="topic">국민 여행조사 데이터 및 크롤링 데이터 수집을 활용하여 머신러닝 분류(Classification) 알고리즘 시각화 하기</p>
+    </div>
+
+    <div>
+        <label for="dataInput">데이터 입력:</label>
+        <input type="text" id="dataInput" placeholder="입력하세요">
+    </div>
+
+    <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="k_means_clustering('K-means Cluster')">K-means Cluster 알고리즘</button>
+    <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
+    <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
+
+    <div id="response"></div>
+
+    <div id="visualization" class="visualization">
+        <!-- Placeholder for visualization graphs -->
+         <div id="text-container">
+        <!-- Placeholder for additional text -->
+             <p>Algorithm: <span id="algorithmName"></span></p>
+        </div>
+         <div id="visualization-container">
+        <!-- Placeholder for visualization graphs -->
+        </div>
+    </div>
+
+    <div id="algorithmDescription" class="visualization">
+        <!-- Placeholder for algorithm description -->
+    </div>
+
+    <script>
+    async function k_means_clustering(algorithm) {
+        try {
+            const response = await fetch('/kmeans/');
+            const data = await response.json();
+            const algorithmName = 'Naive Bayes Classifier';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.encoded_image}" alt="Visualization">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 데이터를 기반으로 1인당 총 여행비용 중 숙박비의 비율과 식비의 비율을 비교하기 위해 조사를 진행했습니다. <br>
+            - 산점도 그래프를 보시면 x축에는 1인당 총 여행비용을, y축에는 각각 숙박비와 식비임을 알 수 있습니다. <br>
+            - 분류를 진행하기 앞서 위 칼럼들이 상관도가 얼마나 높은지, 또 유용한 분류를 나타낼 수 있는지 파악하기 위해 상관계수를 계산했고
+            약 0.8이라는 수치가 나왔습니다. <br>
+            - elbow method을 통해 군집 개수를 정했고, 이상치를 발견해 이를 산점도 그래프에 표현하기 위해 4개의 군집으로 분류를 진행했습니다. <br>
+            - 1인당 총 여행비용에서 10만원단위로 범위를 설정하고 군집화 및 분류작업을 진행했습니다. <br>
+            </p>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
+    function visualizeAlgorithm(algorithm) {
+        // You can implement logic to fetch and display visualization graphs
+        const visualizationDiv = document.getElementById("visualization");
+        visualizationDiv.innerHTML = `<p>시각화 그래프: Placeholder for ${algorithm}</p>`;
+
+        // You can implement logic to fetch and display algorithm description
+        const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+        algorithmDescriptionDiv.innerHTML = `<p>알고리즘 설명: Placeholder for ${algorithm}</p>`;
+
+        // Dynamically set the algorithm name based on the selected algorithm
+        const algorithmName = algorithm;
+
+        // Update the visualization container with the received data
+        document.getElementById("visualization").innerHTML = `<img src="data:image/png;base64, " alt="${algorithmName} Visualization">`;
+
+        // Add algorithm name text dynamically
+        document.getElementById("algorithmDescription").innerHTML = `<p>알고리즘 설명: ${algorithmName}</p>`;
+    }
+
+    function crawlData() {
+        // You can implement logic for crawling data
+        const responseDiv = document.getElementById("response");
+        responseDiv.innerHTML = `<p>크롤링을 활용한 데이터 수집: Placeholder for data crawling result</p>`;
+    }
+    </script>
+</body>
+</html>
