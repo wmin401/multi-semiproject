@@ -181,12 +181,14 @@
                 - 랜덤포레스트는 훈련과정에서 타겟을 분류하는데 주요요인으로 작용하는 특성을 확인할수있습니다.<br>
                 - 오차행렬 히트맵과 ROC곡선 그래프를 시각화해 해당 모델의 성능을 파악할 수 있습니다.<br><br>                
                 <strong>분류보고서</strong><br>
-                - 해당 랜덤포레스트는 약 95%의 정확도를 보여줍니다.<br>
+                - 해당 모델을 통해 약 95%의 정확도로 여행유형을 예측할 수 있습니다.<br>
                 - 각항목의 정밀도, 재현율, F1점수 등을 고려하면 성능이 어느정도 준수함을 알 수 있습니다.<br>
                 </p>`;
 
+
                 // Add accuracy dynamically
                 algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${data.accuracy * 100}%</p>`;
+
 
                 // Add classification report dynamically
                 algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
@@ -223,5 +225,6 @@
         responseDiv.innerHTML = `<p>크롤링을 활용한 데이터 수집: Placeholder for data crawling result</p>`;
     }
     </script>
+
 </body>
 </html>

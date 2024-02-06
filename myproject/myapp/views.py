@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from django.http import JsonResponse
 from sklearn.preprocessing import LabelEncoder, OrdinalEncoder, StandardScaler, label_binarize
+from sklearn.preprocessing import LabelEncoder, OrdinalEncoder, StandardScaler, label_binarize
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix,roc_curve, auc
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix,roc_curve, auc
 import base64
 from io import BytesIO
@@ -20,6 +22,7 @@ import matplotlib.image as mpimg
 
 import seaborn as sns
 import threading  # 새로운 라이브러리 추가
+import matplotlib.font_manager as fm
 import matplotlib.font_manager as fm
 
 
@@ -155,7 +158,7 @@ def RandomForest(request):
     classifier.fit(X_train, y_train)
     y_pred = classifier.predict(X_test)
 
-    # 정확도 측정
+    # 정확도측정
     accuracy = "{:.2f}".format(metrics.accuracy_score(y_test, y_pred))
     print(f'Accuracy: {accuracy}')
     print("\n분류 보고서:\n", classification_report(y_test, y_pred))
@@ -231,6 +234,7 @@ def RandomForest(request):
     axs[1, 1].legend(loc="lower right")
 
     plt.tight_layout()
+
     # 그래프를 이미지로 변환
     image_stream = BytesIO()
     plt.savefig(image_stream, format='png')
