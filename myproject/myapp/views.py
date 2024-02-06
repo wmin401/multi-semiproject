@@ -53,7 +53,9 @@ def svm_function(request):
     loaded_model = joblib.load('svm_model.pkl')
     predictions = loaded_model.predict(X_test)
     accuracy = accuracy_score(Y_test, predictions)
-    mean_squared_error_result = mean_squared_error(Y_test, predictions)
+    #mean_squared_error_result = mean_squared_error(Y_test, predictions)
+    classification_result = classification_report(Y_test, predictions)
+
 
     with open('xx.pkl', 'rb') as f:
         xx = pickle.load(f)
@@ -79,7 +81,8 @@ def svm_function(request):
     response_data = {
         'plot_image1': plot_image,
         'accuracy': accuracy,
-        'mean_squared_error': mean_squared_error_result
+
+        'classification_report': classification_result
     }
 
     return JsonResponse(response_data)
