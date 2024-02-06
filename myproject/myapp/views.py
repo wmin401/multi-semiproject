@@ -32,7 +32,7 @@ def DecisionTree(request):
     # 데이터프레임 내용 확인
 
     # 각 변수 분포 확인
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(6, 4))
     plt.hist(df1_scaled, bins=50)
     plt.title("Histogram of Variable Distribution")
     plt.xlabel("COST")
@@ -47,6 +47,7 @@ def DecisionTree(request):
     plt.close()
 
     # 토탈 상관계수
+    plt.figure(figsize=(6, 4))
     sl_col = df1_scaled[['D_TRA1_COST', 'D_TRA1_ONE_COST']]
     sns.heatmap(sl_col.corr(), annot=True, fmt=".2f")
 
