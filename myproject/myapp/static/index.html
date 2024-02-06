@@ -86,7 +86,7 @@
     </div>
 
     <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
-    <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
+    <button onclick="visualizeSupportVectorMachine('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
     <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
     <button onclick="k_means_clustering('K-means Cluster')">K-means Cluster 알고리즘</button>
@@ -174,6 +174,45 @@
             - elbow method을 통해 군집 개수를 정했고, 이상치를 발견해 이를 산점도 그래프에 표현하기 위해 4개의 군집으로 분류를 진행했습니다. <br>
             - 1인당 총 여행비용에서 10만원단위로 범위를 설정하고 군집화 및 분류작업을 진행했습니다. <br>
             </p>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
+    async function visualizeSupportVectorMachine(algorithm) {
+        try {
+            const response = await fetch('/svm/');
+            const data = await response.json();
+            const algorithmName = 'svm_function';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Visualization">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행 동행인 및 전체 교통비에 따른 Support Vector Machine 머신러닝을 활용하여 예측하였습니다.<br>
+            - X-Axis는 전체 교통비(Total transportation cost) 를 나타내며,  Y-Axis 여행 동행인의 수를 나타냅니다.<br>
+              그에따른 숙박/당일 여행 형태를 예측하는 그래프를 그려보았습니다<br>
+
+            <br>- 아래 보이는 리포트는 머신러닝 모델의 성능을 평가하는 여러 지표를 보여줍니다. 여기서 0(파란색- 당일)과 1(붉은색- 숙박)은 두 가지 예측 가능한 클래스를 나타냅니다.<br>
+            - 정확도(Accuracy): 모델의 정확도는 71.28%로, 모든 예측 중 71.28%가 올바르게 예측되었습니다.<br>
+            - 정밀도(Precision): 클래스 0의 정밀도는 0.68, 클래스 1의 정밀도는 0.86입니다. 이는 모델이 클래스 0(당일)보다 클래스 1(숙박)을 더 잘 예측한다는 것을 의미합니다.<br>
+            - 재현율(Recall): 클래스 0의 재현율은 0.96, 클래스 1의 재현율은 0.35입니다. 모델이 클래스 0(당일)의 샘플을 더 잘 인식한다는 것을 의미합니다.<br>
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>`;
+
+            // Add classification report dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
 
 
         } catch (error) {
