@@ -88,10 +88,10 @@
     <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
     <button onclick="visualizeSupportVectorMachine('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
-    <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="visualizeLinearRegression('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="visualizeLogisticRegression('Logistic Regression')">Logistic Regression 알고리즘</button>
     <button onclick="k_means_clustering('K-means Cluster')">K-means Cluster 알고리즘</button>
     <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
-    <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
 
     <div id="response"></div>
 
@@ -221,6 +221,86 @@
         }
     }
 
+    async function visualizeLinearRegression(algorithm) {
+        try {
+            const response = await fetch('/Linear_Regression/');
+            const data = await response.json();
+            const algorithmName = 'Linear_Regression';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Heatmap">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image2}" alt="Training Set">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image3}" alt="Test set">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image4}" alt="MSE Set">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행 비용에 증가에 따른 여행일수의 변화에 관해 Linear Regression 머신러닝을 활용하여 예측.<br>
+            - 선형회귀(Linear Regression) : x값을 입력하여 나온 y값을 통해 예측할수 있다. y=ax+b<br>
+            - 분석하기 앞서 각 컬럼별 상관계수를 히트맵으로 표현해본 결과 0.55의 수치가 나왔다. 해당 수치가 1에 근접할수록 선형회귀 알고리즘의 정확성이 올라가지만, 해당 Data Set의 컬럼으로는 한계가 있다.<br>
+            - Data Set의 비용과 여행일을 가지고 그래프를 그린 결과 Training set과 같은 그래프가 나왔고, x축(비용)이 늘어날수록 y축(여행일수)이 점차 증가하는 추세를 보이고있다.<br>
+            - 해당 데이터를 Linear Regression을 가지고 테스트한 결과 Test set의 그래프가 나왔고, 이전 Training set보다 높은 연관성을 보여주고 있다.<br>
+            - 마지막으로 오차값을 줄이기 위해 MSE방식을 이용하여 알고리즘을 실행한 결과 MSE그래프가 나왔고, 이는 0.64의 오차를 가지며 여행일수에 대입했을때 약 0.6일 정도의 오차를 가지고 있다.<br>
+            - 1~3일차 까지는 데이터의 표본이 다수 존재해 비용이 늘어남에 따라 여행일수가 늘어나는 것을 확인 할 수 있었고, 4일차 이후 부터는 테이터의 표본이 부족해 정확성이 떨어지는 모습을 보여준다.<br>
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>`;
+
+            // Add classification report dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
+    async function visualizeLogisticRegression(algorithm) {
+        try {
+            console.log("test");
+            const response = await fetch('/Logistic_Regression/');
+            const data = await response.json();
+            const algorithmName = 'Logistic_Regression';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Top_3_Travel_Types">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행지와 여행유형을 가지고 여행유형별 가장인기있는 여행지 Top3을 Logistic Regression 머신러닝을 활용하여 분석.<br>
+            - 로지스틱회귀 : 데이터가 어떤 범주에 속할 확률을 0에서1 사이의 값으로 예측하고 그 확률에 따라 가능성이 더 높은 범주에 속하는 것으로 분류하는 이진분류 모델.<br>
+            - 2022년의 여행지와 여행유형문자 데이터를 인코딩하여 Boolean타입과 숫자로 변경 후 데이터 분석.<br>
+            - 데이터의 정확도는 54% 정도로 낮은모습을 보이지만, Logistic Regression 분류의 특성상 데이터의 편향치가 높을수록 정확도가 낮게 나오는 경향이 있어 정확도가 낮다하여 분석모델의 성능이 크게 나쁘다고만 생각 할수는 없다.<br>
+            - 분석 결과 그래프를 확인해보면, 강릉, 경주, 제주의 여행지 선택이 가장 많았고 그중에선 자연관광, 맛집탐방, 휴식의 순으로 여행유형의 선택이 많았다.<br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행지와 여행유형을 가지고 여행유형별 가장인기있는 여행지 Top3을 Logistic Regression 머신러닝을 활용하여 분석.<br>
+            - 로지스틱회귀 : 데이터가 어떤 범주에 속할 확률을 0에서1 사이의 값으로 예측하고 그 확률에 따라 가능성이 더 높은 범주에 속하는 것으로 분류하는 이진분류 모델.<br>
+            - 2022년의 여행지와 여행유형문자 데이터를 인코딩하여 Boolean타입과 숫자로 변경 후 데이터 분석.<br>
+            - 분석 결과 그래프를 확인해보면, 강릉, 경주, 제주의 여행지 선택이 가장 많았고 그중에선 자연관광, 맛집탐방, 휴식의 순으로 여행유형의 선택이 많았다.<br>
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>`;
+
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
     function visualizeAlgorithm(algorithm) {
         // You can implement logic to fetch and display visualization graphs
         const visualizationDiv = document.getElementById("visualization");
@@ -240,11 +320,6 @@
         document.getElementById("algorithmDescription").innerHTML = `<p>알고리즘 설명: ${algorithmName}</p>`;
     }
 
-    function crawlData() {
-        // You can implement logic for crawling data
-        const responseDiv = document.getElementById("response");
-        responseDiv.innerHTML = `<p>크롤링을 활용한 데이터 수집: Placeholder for data crawling result</p>`;
-    }
     </script>
 </body>
 </html>
