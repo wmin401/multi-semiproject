@@ -110,7 +110,7 @@ print("==== 모델 성능 평가 끝 ====")
 # 시각화
 print("==== 의사결정트리 시각화 시작 ====")
 plt.figure(figsize=(10, 7))
-tree.plot_tree(DTR, max_depth=1, feature_names=X.columns, filled=True)
+tree.plot_tree(DTR, max_depth=4, feature_names=X.columns, filled=True)
 plt.title("Decision Tree Visualization")
 plt.show()
 print("==== 의사결정트리 시각화 끝 ====")

@@ -143,10 +143,10 @@
             </p>`;
 
             // Add mse dynamically
-            algorithmDescriptionDiv.innerHTML += `<p>Mean Squared Error: ${data.mse}</p>`;
+            algorithmDescriptionDiv.innerHTML += `<p>Mean Squared Error: ${parseFloat(data.mse).toFixed(2)}</p>`;
 
             // Add r2 dynamically
-            algorithmDescriptionDiv.innerHTML += `<p>R-Squared: ${data.r2_score}</p>`;
+            algorithmDescriptionDiv.innerHTML += `<p>R-Squared: ${parseFloat(data.r2_score).toFixed(2)}</p>`;
 
 
         } catch (error) {
