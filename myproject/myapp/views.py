@@ -41,6 +41,7 @@ def plot_mse(X_test, y_test, y_pred, mse):
     plt.title('Linear Regression using MSE\nMSE: {0:.2f}'.format(mse))
     plt.xlabel('Cost')
     plt.ylabel('the number of days of travel')
+    plt.yticks(ticks=np.arange(1, max(y_test) + 1, step=1))  # y축 눈금 설정
     plt.legend()
 
     # 그래프를 이미지 파일로 저장
