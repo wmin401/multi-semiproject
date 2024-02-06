@@ -85,7 +85,7 @@
         <input type="text" id="dataInput" placeholder="입력하세요">
     </div>
 
-    <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
+    <button onclick="visualizeDecisionTree('Decision Tree')">Decision Tree 알고리즘</button>
     <button onclick="visualizeSupportVectorMachine('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeRandomForest('Random Forest')">RandomForest 알고리즘</button>
     <button onclick="visualizeLinearRegression('Linear Regression')">Linear Regression 알고리즘</button>
@@ -348,25 +348,51 @@
                 // Handle error, show a message, etc.
             }
         }
+        async function visualizeDecisionTree(algorithm) {
+        try {
+            const response = await fetch('/DecisionTree/');
+            const data = await response.json();
+            const algorithmName = 'DecisionTree';  // You can customize this based on the selected algorithm
 
-    function visualizeAlgorithm(algorithm) {
-        // You can implement logic to fetch and display visualization graphs
-        const visualizationDiv = document.getElementById("visualization");
-        visualizationDiv.innerHTML = `<p>시각화 그래프: Placeholder for ${algorithm}</p>`;
 
-        // You can implement logic to fetch and display algorithm description
-        const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
-        algorithmDescriptionDiv.innerHTML = `<p>알고리즘 설명: Placeholder for ${algorithm}</p>`;
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
 
-        // Dynamically set the algorithm name based on the selected algorithm
-        const algorithmName = algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Scatter">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image2}" alt="Heatmap">`;
+            document.getElementById("visualization-container").innerHTML += `<img src="data:image/png;base64, ${data.plot_image3}" alt="Decision Tree Visualization">`;
+            // Add algorithm name text dynamically
 
-        // Update the visualization container with the received data
-        document.getElementById("visualization").innerHTML = `<img src="data:image/png;base64, " alt="${algorithmName} Visualization">`;
 
-        // Add algorithm name text dynamically
-        document.getElementById("algorithmDescription").innerHTML = `<p>알고리즘 설명: ${algorithmName}</p>`;
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행 총 경비에 따른 1인 지출 비용을 DecisionTree 머신러닝을 활용하여 예측하였습니다.<br>
+            - D_TRA1_COST 는 노드를 나누는 기준이 되는 변수이며, MSE, MAE가 가장 낮아지는 값을 기준으로 잡습니다.<br>
+            - squared_error 는 예측 오차를 나타내는 값이며, 오차를 최소화 하는 방향으로 트리를 분할합니다.<br>
+            - samples 는 노드에 속하는 데이터의 개수를 나타내고, 트리의 루트노드는 전체 데이터의 개수가 됩니다.<br>
+            - value 는 해당 노드에서의 예측값을 나타내고, 해당노드에 속하는 타겟 변수의 평균값으로 설정됩니다.<br>
+            - 루트노드는 여행 총 경비가 표준화된 0.815 이하인 경우 왼쪽노드, 그렇지 않을 경우 오른쪽노드로 분류 됩니다, 여기서 처리된 샘플의 수는 20,012개 이면서 평균 1인당 지출 비용은 표준화된 0.003입니다.<br>
+            - 왼쪽 노드는 여행 총 경비가 표준화된 루트값 0.815이하인 경우의 샘플들이 분류된 것입니다. 이 경우에는 1인당 지출 비용은 평균적으로 표준화된 -0.194이고 여행 총 경비가 낮을수록 1인당 지출 비용도 낮아지는 모습을 보여줍니다.<br>
+            - 오른쪽 노드는 여행 총 경비가 표준화된 루트값 0.815초과인 경우의 샘플들이 분류된 것입니다. 이 경우에는 1인당 지출 비용은 평균적으로 표준화된 2.121이고 여행 총 경비가 높을수록 1인당 지출 비용도 높아지는 모습을 보여줍니다.<br>
+            - 이와같이 의사결정나무 시각화를 통해 알 수 있는 것은 여행 총 경비가 1인당 지출 비용에 어떠한 영향을 미치는지를 알 수 있습니다.
+
+            </p>`;
+
+            // Add mse dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Mean Squared Error: ${parseFloat(data.mse).toFixed(2)}</p>`;
+
+            // Add r2 dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>R-Squared: ${parseFloat(data.r2_score).toFixed(2)}</p>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
     }
+
+
 
     </script>
 </body>

@@ -1,6 +1,6 @@
 # myapp/urls.py
 from django.urls import path
-from .views import naive_bayes, k_means_clustering, svm_function, Linear_Regression, Logistic_Regression,RandomForest
+from .views import naive_bayes, k_means_clustering, svm_function, Linear_Regression, Logistic_Regression,RandomForest, DecisionTree
 from django.views.static import serve
 from django.conf import settings
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path('Linear_Regression/', Linear_Regression, name='Linear_Regression'),
     path('Logistic_Regression/', Logistic_Regression, name='Logistic_Regression'),
     path('RandomForest/', RandomForest, name='RandomForest'),
+    path('DecisionTree/', DecisionTree, name='DecisionTree'),
 ]
 
 
