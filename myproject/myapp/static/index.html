@@ -87,7 +87,7 @@
 
     <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
     <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
-    <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
+    <button onclick="visualizeRandomForest('Random Forest')">RandomForest 알고리즘</button>   
     <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
     <button onclick="visualizeAlgorithm('K-means Cluster')">K-means Cluster 알고리즘</button>
     <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
@@ -151,6 +151,53 @@
         }
     }
 
+
+    async function visualizeRandomForest(algorithm) {
+            try {
+                const response = await fetch('/RandomForest/');
+                const data = await response.json();
+                const algorithmName = 'RandomForest';  // You can customize this based on the selected algorithm
+
+
+                // Update the visualization container with the received data
+                document.getElementById("algorithmName").textContent =  algorithm;
+                document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.encoded_image}" alt="Naive Bayes Classifier Visualization">`;
+                // Add algorithm name text dynamically
+
+
+                 // Add algorithm name text dynamically
+                const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+                algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+                <strong>랜덤포레스트(RandomForest)</strong><br>
+                - 2022년 국민 여행조사 Data Set에 근거하여, 여행유형을 RandomForest 머신러닝을 활용하여 예측하였습니다.<br>
+                - 랜덤포레스트는 다수의 결정 트리들을 배깅기법을 사용해 학습시키고 예측을 실행하는 앙상블 기법으로 모델의 편향을 증가시켜 과대 적합의 위험을 감소시켜 다양한 분야에서 비교적 좋은 성능을 보여줍니다.<br>
+                - 분류모델의 랜덤포레스트는 부스트스트랩 샘플을 이용해 여러개의 랜덤한 트리를 생성하여 각 트리들이 예측한 확률중 높은 확률을 가진 클래스가 예측값이 됩니다.<br>
+                - 현재 모델은 오버샘플링과 언더샘플링을 통해 데이터불균형을 어느정도 해소할 수 있도록 하였습니다.<br>
+                - 데이터의 80%는 Training_set, 20%는 Test_set으로 이루어져있습니다.<br>
+                - 랜덤서치를 사용해서 최적화된 하이퍼파라미터를 도출 하였습니다. <br>
+                - 전체 트리의 갯수는 490개이며 max_feature는 10개로 제한하였습니다. <br><br>
+                <strong>시각화그래프</strong><br>
+                - 랜덤포레스트의 첫번째트리를 시각화해 트리구조의 모습을 확인할 수 있습니다.<br>
+                - 랜덤포레스트는 훈련과정에서 타겟을 분류하는데 주요요인으로 작용하는 특성을 확인할수있습니다.<br>
+                - 오차행렬 히트맵과 ROC곡선 그래프를 시각화해 해당 모델의 성능을 파악할 수 있습니다.<br><br>                
+                <strong>분류보고서</strong><br>
+                - 해당 랜덤포레스트는 약 95%의 정확도를 보여줍니다.<br>
+                - 각항목의 정밀도, 재현율, F1점수 등을 고려하면 성능이 어느정도 준수함을 알 수 있습니다.<br>
+                </p>`;
+
+                // Add accuracy dynamically
+                algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${data.accuracy * 100}%</p>`;
+
+                // Add classification report dynamically
+                algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                // Handle error, show a message, etc.
+            }
+        }
+        
     function visualizeAlgorithm(algorithm) {
         // You can implement logic to fetch and display visualization graphs
         const visualizationDiv = document.getElementById("visualization");
