@@ -89,7 +89,7 @@
     <button onclick="visualizeAlgorithm('Support Vector Machine')">Support Vector Machine 알고리즘</button>
     <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
     <button onclick="visualizeAlgorithm('Linear Regression')">Linear Regression 알고리즘</button>
-    <button onclick="visualizeAlgorithm('K-means Cluster')">K-means Cluster 알고리즘</button>
+    <button onclick="k_means_clustering('K-means Cluster')">K-means Cluster 알고리즘</button>
     <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
     <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
 
@@ -143,6 +143,37 @@
 
             // Add classification report dynamically
             algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
+    async function k_means_clustering(algorithm) {
+        try {
+            const response = await fetch('/kmeans/');
+            const data = await response.json();
+            const algorithmName = 'Naive Bayes Classifier';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.encoded_image}" alt="Visualization">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 데이터를 기반으로 1인당 총 여행비용 중 숙박비의 비율과 식비의 비율을 비교하기 위해 조사를 진행했습니다. <br>
+            - 산점도 그래프를 보시면 x축에는 1인당 총 여행비용을, y축에는 각각 숙박비와 식비임을 알 수 있습니다. <br>
+            - 분류를 진행하기 앞서 위 칼럼들이 상관도가 얼마나 높은지, 또 유용한 분류를 나타낼 수 있는지 파악하기 위해 상관계수를 계산했고
+            약 0.8이라는 수치가 나왔습니다. <br>
+            - elbow method을 통해 군집 개수를 정했고, 이상치를 발견해 이를 산점도 그래프에 표현하기 위해 4개의 군집으로 분류를 진행했습니다. <br>
+            - 1인당 총 여행비용에서 10만원단위로 범위를 설정하고 군집화 및 분류작업을 진행했습니다. <br>
+            </p>`;
 
 
         } catch (error) {
