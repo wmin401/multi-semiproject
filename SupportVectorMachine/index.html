@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통장잔고2조 - 머신러닝 알고리즘 시각화</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            display: inline-block;
+        }
+
+        #response {
+            margin-top: 20px;
+        }
+
+        .visualization {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #teamName {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        #topic {
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="team-info">
+        <p id="teamName">통장잔고2조</p>
+        <p id="topic">국민 여행조사 데이터 및 크롤링 데이터 수집을 활용하여 머신러닝 분류(Classification) 알고리즘 시각화 하기</p>
+    </div>
+
+    <div>
+        <label for="dataInput">데이터 입력:</label>
+        <input type="text" id="dataInput" placeholder="입력하세요">
+    </div>
+
+    <button onclick="visualizeAlgorithm('Decision Tree')">Decision Tree 알고리즘</button>
+    <button onclick="visualizeSupportVectorMachine('Support Vector Machine')">Support Vector Machine 알고리즘</button>
+    <button onclick="visualizeAlgorithm('Ensemble Learning')">Ensemble Learning 알고리즘</button>
+    <button onclick="visualizeLinearRegression('Linear Regression')">Linear Regression 알고리즘</button>
+    <button onclick="visualizeLogisticRegression('Logistic Regression')">Logistic Regression 알고리즘</button>
+    <button onclick="visualizeAlgorithm('K-means Cluster')">K-means Cluster 알고리즘</button>
+    <button onclick="visualizeNaiveBayes('Naive Bayes Classifier')">Naive Bayes Classifier 알고리즘</button>
+    <button onclick="crawlData()">크롤링을 활용한 데이터 수집</button>
+
+    <div id="response"></div>
+
+    <div id="visualization" class="visualization">
+        <!-- Placeholder for visualization graphs -->
+         <div id="text-container">
+        <!-- Placeholder for additional text -->
+             <p>Algorithm: <span id="algorithmName"></span></p>
+        </div>
+         <div id="visualization-container">
+        <!-- Placeholder for visualization graphs -->
+        </div>
+    </div>
+
+    <div id="algorithmDescription" class="visualization">
+        <!-- Placeholder for algorithm description -->
+    </div>
+
+    <script>
+    async function visualizeSupportVectorMachine(algorithm) {
+        try {
+            const response = await fetch('/svm/');
+            const data = await response.json();
+            const algorithmName = 'svm_function';  // You can customize this based on the selected algorithm
+
+
+            // Update the visualization container with the received data
+            document.getElementById("algorithmName").textContent =  algorithm;
+            document.getElementById("visualization-container").innerHTML = `<img src="data:image/png;base64, ${data.plot_image1}" alt="Visualization">`;
+            // Add algorithm name text dynamically
+
+
+             // Add algorithm name text dynamically
+            const algorithmDescriptionDiv = document.getElementById("algorithmDescription");
+            algorithmDescriptionDiv.innerHTML = `<p>Algorithm Description:<br><br>
+            - 2022년 국민 여행조사 Data Set에 근거하여, 여행 동행인 및 전체 교통비에 따른 Support Vector Machine 머신러닝을 활용하여 예측하였습니다.<br>
+            - X-Axis는 전체 교통비(Total transportation cost) 를 나타내며,  Y-Axis 여행 동행인의 수를 나타냅니다.<br>
+              그에따른 숙박/당일 여행 형태를 예측하는 그래프를 그려보았습니다<br>
+
+            <br>- 아래 보이는 리포트는 머신러닝 모델의 성능을 평가하는 여러 지표를 보여줍니다. 여기서 0(파란색- 당일)과 1(붉은색- 숙박)은 두 가지 예측 가능한 클래스를 나타냅니다.<br>
+            - 정확도(Accuracy): 모델의 정확도는 71.28%로, 모든 예측 중 71.28%가 올바르게 예측되었습니다.<br>
+            - 정밀도(Precision): 클래스 0의 정밀도는 0.68, 클래스 1의 정밀도는 0.86입니다. 이는 모델이 클래스 0(당일)보다 클래스 1(숙박)을 더 잘 예측한다는 것을 의미합니다.<br>
+            - 재현율(Recall): 클래스 0의 재현율은 0.96, 클래스 1의 재현율은 0.35입니다. 모델이 클래스 0(당일)의 샘플을 더 잘 인식한다는 것을 의미합니다.<br>
+            </p>`;
+
+            // Add accuracy dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>`;
+
+            // Add classification report dynamically
+            algorithmDescriptionDiv.innerHTML += `<p>Classification Report:</p><pre>${data.classification_report}</pre>`;
+
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            // Handle error, show a message, etc.
+        }
+    }
+
+
+    </script>
+</body>
+</html>
+
+
